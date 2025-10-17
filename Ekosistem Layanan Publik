@@ -1,2 +1,488 @@
 # integrasi-id-kuantum-resisten-ai-2030
 Integrasi Identitas Digital Kuantum-Resisten Berbasis Blockchain Generasi Keempat dengan Kecerdasan Buatan Otonom untuk Ekosistem Layanan Publik 2030
+import React, { useState, useEffect } from 'react';
+import { Shield, Lock, Brain, Cpu, Database, CheckCircle, AlertCircle, Activity, Users, FileText, Zap } from 'lucide-react';
+
+// Simulasi Post-Quantum Cryptography (Lattice-based)
+class QuantumResistantCrypto {
+  static generateKeyPair() {
+    const privateKey = Array.from({ length: 32 }, () => 
+      Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+    ).join('');
+    const publicKey = 'KYBER1024:' + Array.from({ length: 32 }, () => 
+      Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+    ).join('');
+    return { privateKey, publicKey };
+  }
+
+  static sign(data, privateKey) {
+    return 'DILITHIUM:' + btoa(data + privateKey).slice(0, 64);
+  }
+
+  static verify(data, signature, publicKey) {
+    return signature.startsWith('DILITHIUM:');
+  }
+}
+
+// Blockchain Node
+class BlockchainNode {
+  constructor() {
+    this.chain = [];
+    this.pendingTransactions = [];
+    this.createGenesisBlock();
+  }
+
+  createGenesisBlock() {
+    const genesis = {
+      index: 0,
+      timestamp: Date.now(),
+      transactions: [],
+      previousHash: '0',
+      hash: this.calculateHash({ index: 0, timestamp: Date.now(), transactions: [], previousHash: '0' }),
+      quantumProof: 'GENESIS_QUANTUM_SEAL'
+    };
+    this.chain.push(genesis);
+  }
+
+  calculateHash(block) {
+    const data = JSON.stringify(block);
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).padStart(64, '0').slice(0, 64);
+  }
+
+  addTransaction(transaction) {
+    this.pendingTransactions.push(transaction);
+  }
+
+  mineBlock() {
+    if (this.pendingTransactions.length === 0) return null;
+
+    const block = {
+      index: this.chain.length,
+      timestamp: Date.now(),
+      transactions: [...this.pendingTransactions],
+      previousHash: this.chain[this.chain.length - 1].hash,
+      hash: '',
+      quantumProof: 'QR-PROOF-' + Math.random().toString(36).slice(2, 11).toUpperCase()
+    };
+
+    block.hash = this.calculateHash(block);
+    this.chain.push(block);
+    this.pendingTransactions = [];
+    return block;
+  }
+
+  getLatestBlock() {
+    return this.chain[this.chain.length - 1];
+  }
+}
+
+// AI Agent untuk Verifikasi dan Analisis
+class AutonomousAI {
+  static analyzeIdentity(identity) {
+    const riskScore = Math.random() * 100;
+    const trustLevel = riskScore > 70 ? 'Tinggi' : riskScore > 40 ? 'Sedang' : 'Rendah';
+    
+    return {
+      trustLevel,
+      riskScore: riskScore.toFixed(2),
+      anomalyDetected: riskScore < 30,
+      recommendations: this.generateRecommendations(riskScore)
+    };
+  }
+
+  static generateRecommendations(riskScore) {
+    if (riskScore < 30) {
+      return ['Verifikasi biometrik tambahan diperlukan', 'Audit riwayat transaksi'];
+    } else if (riskScore < 70) {
+      return ['Monitoring berkala', 'Update kredensial setiap 90 hari'];
+    }
+    return ['Identitas terverifikasi penuh', 'Akses layanan premium tersedia'];
+  }
+
+  static predictServiceNeeds(history) {
+    const services = [
+      'Pembuatan Surat Keterangan',
+      'Perpanjangan Izin',
+      'Pembayaran Pajak',
+      'Pendaftaran Usaha',
+      'Layanan Kesehatan'
+    ];
+    return services.slice(0, Math.floor(Math.random() * 3) + 2);
+  }
+}
+
+function App() {
+  const [blockchain] = useState(() => new BlockchainNode());
+  const [identities, setIdentities] = useState([]);
+  const [selectedIdentity, setSelectedIdentity] = useState(null);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [activeTab, setActiveTab] = useState('identity');
+  const [logs, setLogs] = useState([]);
+
+  const addLog = (message, type = 'info') => {
+    setLogs(prev => [...prev, { message, type, timestamp: new Date().toLocaleTimeString() }].slice(-5));
+  };
+
+  const createNewIdentity = () => {
+    const keys = QuantumResistantCrypto.generateKeyPair();
+    const identity = {
+      id: 'QID-' + Math.random().toString(36).slice(2, 11).toUpperCase(),
+      name: `Warga ${identities.length + 1}`,
+      publicKey: keys.publicKey,
+      privateKey: keys.privateKey,
+      created: new Date().toISOString(),
+      verified: false,
+      services: []
+    };
+
+    // Tambahkan ke blockchain
+    const transaction = {
+      type: 'IDENTITY_CREATED',
+      identityId: identity.id,
+      publicKey: identity.publicKey,
+      timestamp: Date.now()
+    };
+
+    const signature = QuantumResistantCrypto.sign(JSON.stringify(transaction), keys.privateKey);
+    transaction.signature = signature;
+
+    blockchain.addTransaction(transaction);
+    const block = blockchain.mineBlock();
+
+    setIdentities(prev => [...prev, identity]);
+    addLog(`Identitas baru dibuat: ${identity.id}`, 'success');
+    addLog(`Blok #${block.index} ditambahkan ke blockchain`, 'success');
+  };
+
+  const verifyIdentity = (identity) => {
+    const analysis = AutonomousAI.analyzeIdentity(identity);
+    setAiAnalysis(analysis);
+
+    const updatedIdentity = { ...identity, verified: true };
+    setIdentities(prev => prev.map(i => i.id === identity.id ? updatedIdentity : i));
+
+    // Catat ke blockchain
+    const transaction = {
+      type: 'IDENTITY_VERIFIED',
+      identityId: identity.id,
+      trustLevel: analysis.trustLevel,
+      timestamp: Date.now()
+    };
+
+    blockchain.addTransaction(transaction);
+    blockchain.mineBlock();
+
+    addLog(`AI Otonom: Identitas ${identity.id} diverifikasi - Trust Level: ${analysis.trustLevel}`, 'success');
+  };
+
+  const accessService = (identity, serviceName) => {
+    const transaction = {
+      type: 'SERVICE_ACCESS',
+      identityId: identity.id,
+      service: serviceName,
+      timestamp: Date.now()
+    };
+
+    const signature = QuantumResistantCrypto.sign(JSON.stringify(transaction), identity.privateKey);
+    transaction.signature = signature;
+
+    blockchain.addTransaction(transaction);
+    const block = blockchain.mineBlock();
+
+    const updatedIdentity = {
+      ...identity,
+      services: [...identity.services, { name: serviceName, timestamp: Date.now() }]
+    };
+
+    setIdentities(prev => prev.map(i => i.id === identity.id ? updatedIdentity : i));
+    addLog(`Layanan "${serviceName}" diakses oleh ${identity.id}`, 'info');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Shield className="w-12 h-12 text-cyan-400" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              Quantum-Safe Digital Identity System
+            </h1>
+          </div>
+          <p className="text-gray-300 text-lg">
+            Sistem Identitas Digital Kuantum-Resisten dengan AI Otonom untuk Layanan Publik
+          </p>
+        </div>
+
+        {/* Stats Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-400 text-sm">Total Identitas</p>
+                <p className="text-3xl font-bold text-cyan-400">{identities.length}</p>
+              </div>
+              <Users className="w-10 h-10 text-cyan-400 opacity-50" />
+            </div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-400 text-sm">Blok Blockchain</p>
+                <p className="text-3xl font-bold text-purple-400">{blockchain.chain.length}</p>
+              </div>
+              <Database className="w-10 h-10 text-purple-400 opacity-50" />
+            </div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-400 text-sm">Terverifikasi</p>
+                <p className="text-3xl font-bold text-green-400">
+                  {identities.filter(i => i.verified).length}
+                </p>
+              </div>
+              <CheckCircle className="w-10 h-10 text-green-400 opacity-50" />
+            </div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-400 text-sm">Enkripsi</p>
+                <p className="text-xl font-bold text-yellow-400">KYBER-1024</p>
+              </div>
+              <Lock className="w-10 h-10 text-yellow-400 opacity-50" />
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Panel - Controls */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Create Identity */}
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Zap className="w-5 h-5 text-yellow-400" />
+                Kontrol Sistem
+              </h2>
+              <button
+                onClick={createNewIdentity}
+                className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+              >
+                <Shield className="w-5 h-5" />
+                Buat Identitas Digital Baru
+              </button>
+            </div>
+
+            {/* Activity Log */}
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-green-400" />
+                Log Aktivitas
+              </h2>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {logs.map((log, idx) => (
+                  <div key={idx} className="text-sm bg-black/30 rounded p-2">
+                    <span className="text-gray-400 text-xs">{log.timestamp}</span>
+                    <p className={`${log.type === 'success' ? 'text-green-400' : 'text-cyan-400'}`}>
+                      {log.message}
+                    </p>
+                  </div>
+                ))}
+                {logs.length === 0 && (
+                  <p className="text-gray-500 text-center py-4">Belum ada aktivitas</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Main View */}
+          <div className="lg:col-span-2">
+            {/* Tabs */}
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 overflow-hidden">
+              <div className="flex border-b border-white/20">
+                <button
+                  onClick={() => setActiveTab('identity')}
+                  className={`flex-1 py-4 px-6 font-semibold transition-all ${
+                    activeTab === 'identity'
+                      ? 'bg-white/20 text-cyan-400 border-b-2 border-cyan-400'
+                      : 'text-gray-400 hover:bg-white/5'
+                  }`}
+                >
+                  <Users className="w-5 h-5 inline mr-2" />
+                  Identitas Digital
+                </button>
+                <button
+                  onClick={() => setActiveTab('blockchain')}
+                  className={`flex-1 py-4 px-6 font-semibold transition-all ${
+                    activeTab === 'blockchain'
+                      ? 'bg-white/20 text-purple-400 border-b-2 border-purple-400'
+                      : 'text-gray-400 hover:bg-white/5'
+                  }`}
+                >
+                  <Database className="w-5 h-5 inline mr-2" />
+                  Blockchain
+                </button>
+                <button
+                  onClick={() => setActiveTab('ai')}
+                  className={`flex-1 py-4 px-6 font-semibold transition-all ${
+                    activeTab === 'ai'
+                      ? 'bg-white/20 text-green-400 border-b-2 border-green-400'
+                      : 'text-gray-400 hover:bg-white/5'
+                  }`}
+                >
+                  <Brain className="w-5 h-5 inline mr-2" />
+                  AI Otonom
+                </button>
+              </div>
+
+              <div className="p-6 max-h-[600px] overflow-y-auto">
+                {/* Identity Tab */}
+                {activeTab === 'identity' && (
+                  <div className="space-y-4">
+                    {identities.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Shield className="w-16 h-16 mx-auto mb-4 text-gray-500" />
+                        <p className="text-gray-400">Belum ada identitas digital yang terdaftar</p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Klik tombol di atas untuk membuat identitas baru
+                        </p>
+                      </div>
+                    ) : (
+                      identities.map(identity => (
+                        <div
+                          key={identity.id}
+                          className="bg-black/30 rounded-lg p-4 border border-white/10 hover:border-cyan-400/50 transition-all"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h3 className="font-bold text-lg flex items-center gap-2">
+                                {identity.name}
+                                {identity.verified && (
+                                  <CheckCircle className="w-5 h-5 text-green-400" />
+                                )}
+                              </h3>
+                              <p className="text-sm text-gray-400">{identity.id}</p>
+                            </div>
+                            {!identity.verified && (
+                              <button
+                                onClick={() => verifyIdentity(identity)}
+                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold transition-all"
+                              >
+                                Verifikasi
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              <Lock className="w-4 h-4 text-yellow-400" />
+                              <span className="text-gray-400">Public Key:</span>
+                              <code className="text-xs text-cyan-400 truncate">
+                                {identity.publicKey.slice(0, 40)}...
+                              </code>
+                            </div>
+
+                            {identity.services.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-white/10">
+                                <p className="text-gray-400 mb-2">Layanan yang Diakses:</p>
+                                {identity.services.map((service, idx) => (
+                                  <div key={idx} className="text-xs bg-white/5 rounded px-2 py-1 mb-1">
+                                    {service.name}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {identity.verified && (
+                              <div className="mt-3 pt-3 border-t border-white/10">
+                                <button
+                                  onClick={() => accessService(identity, 'Pembuatan KTP Digital')}
+                                  className="w-full bg-purple-500/30 hover:bg-purple-500/50 text-white px-3 py-2 rounded text-sm transition-all"
+                                >
+                                  <FileText className="w-4 h-4 inline mr-2" />
+                                  Akses Layanan Publik
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {/* Blockchain Tab */}
+                {activeTab === 'blockchain' && (
+                  <div className="space-y-4">
+                    {blockchain.chain.map(block => (
+                      <div
+                        key={block.index}
+                        className="bg-black/30 rounded-lg p-4 border border-purple-400/30"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-bold text-lg text-purple-400">
+                            Blok #{block.index}
+                          </h3>
+                          <span className="text-xs bg-purple-500/30 px-2 py-1 rounded">
+                            {block.quantumProof}
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <span className="text-gray-400">Hash:</span>
+                            <code className="block text-xs text-purple-300 mt-1 break-all">
+                              {block.hash}
+                            </code>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Previous Hash:</span>
+                            <code className="block text-xs text-gray-500 mt-1 break-all">
+                              {block.previousHash}
+                            </code>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Transaksi: </span>
+                            <span className="text-white">{block.transactions.length}</span>
+                          </div>
+
+                          {block.transactions.length > 0 && (
+                            <div className="mt-2 pt-2 border-t border-white/10">
+                              {block.transactions.map((tx, idx) => (
+                                <div key={idx} className="text-xs bg-white/5 rounded px-2 py-1 mb-1">
+                                  <span className="text-cyan-400">{tx.type}</span>
+                                  {tx.identityId && (
+                                    <span className="text-gray-400 ml-2">- {tx.identityId}</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* AI Tab */}
+                {activeTab === 'ai' && (
+                  <div className="space-y-4">
+                    {aiAnalysis ? (
+                      <div className="bg-black/30 rounded-lg p-6 border border-green-400/30">
+                        <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+                          <Brain className="w-6 h-6 text-green-400" />
+                          Analisis AI Otonom
+                        </h3>
+
+                        <div 
