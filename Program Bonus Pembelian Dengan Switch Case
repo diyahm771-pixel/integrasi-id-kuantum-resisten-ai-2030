@@ -1,0 +1,38 @@
+#include <stdio.h>
+
+int main() {
+    float total, total_akhir;
+    int kategori;
+
+    printf("=== PROGRAM BONUS PEMBELIAN ===\n");
+    printf("Masukkan total pembelian: ");
+    scanf("%f", &total);
+
+    if (total > 100000)
+        kategori = 1;
+    else if (total > 50000 && total <= 100000)
+        kategori = 2;
+    else
+        kategori = 3;
+
+    switch(kategori) {
+        case 1:
+            total_akhir = total - (0.10 * total);
+            printf("Diskon 10%% diberikan!\n");
+            printf("Total setelah diskon = %.2f\n", total_akhir);
+            break;
+
+        case 2:
+            total_akhir = total - 7000;
+            printf("Potongan 7.000 diberikan!\n");
+            printf("Total setelah potongan = %.2f\n", total_akhir);
+            break;
+
+        case 3:
+            printf("Tidak ada bonus.\n");
+            printf("Total bayar = %.2f\n", total);
+            break;
+    }
+
+    return 0;
+}
