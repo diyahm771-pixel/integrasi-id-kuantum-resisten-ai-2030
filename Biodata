@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+int main() {
+
+    printf("===== BIODATA DIRI =====\n\n");
+
+    printf("Nama Lengkap      : TARHADI\n");
+    printf("Umur              : 28 tahun\n");
+    printf("Jenis Kelamin     : Laki-laki\n");
+    printf("Tempat/Tgl Lahir  : Kendal, 10 September 1997\n");
+    printf("Alamat Lengkap    : Turunrejo RT 01 RW 04, Kec. Brangsong, Kab. Kendal\n");
+    printf("Nomor HP          : 085959696231\n");
+    printf("Email             : diyahm771@gmail.com\n");
+    printf("Status            : Mahasiswa dan Pekerja\n");
+
+    printf("\n=========================\n");
+
+    return 0;
+}
