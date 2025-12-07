@@ -1,51 +1,56 @@
-#include <stdio.h>
+#include <iostream>
+using namespace std;
 
 int main() {
-    int pilihan;
-    float a, b, hasil;
+    float angka1, angka2, hasil;
+    char operasi;
+    int ulang = 1;
 
-    printf("=== PROGRAM KALKULATOR ===\n");
-    printf("Masukkan bilangan pertama : ");
-    scanf("%f", &a);
-    printf("Masukkan bilangan kedua   : ");
-    scanf("%f", &b);
+    while (ulang == 1) {
+        cout << "\n=== KALKULATOR SEDERHANA ===\n";
 
-    printf("\nMenu Operasi:\n");
-    printf("1. Penjumlahan\n");
-    printf("2. Pengurangan\n");
-    printf("3. Perkalian\n");
-    printf("4. Pembagian\n");
-    printf("Pilih menu (1-4): ");
-    scanf("%d", &pilihan);
+        cout << "Masukkan angka pertama : ";
+        cin >> angka1;
 
-    switch(pilihan) {
-        case 1:
-            hasil = a + b;
-            printf("Hasil penjumlahan = %.2f\n", hasil);
-            break;
+        cout << "Masukkan operator (+, -, *, /) : ";
+        cin >> operasi;
 
-        case 2:
-            hasil = a - b;
-            printf("Hasil pengurangan = %.2f\n", hasil);
-            break;
+        cout << "Masukkan angka kedua   : ";
+        cin >> angka2;
 
-        case 3:
-            hasil = a * b;
-            printf("Hasil perkalian = %.2f\n", hasil);
-            break;
+        switch (operasi) {
+            case '+':
+                hasil = angka1 + angka2;
+                cout << "Hasil: " << hasil << endl;
+                break;
 
-        case 4:
-            if (b != 0) {
-                hasil = a / b;
-                printf("Hasil pembagian = %.2f\n", hasil);
-            } else {
-                printf("Error: Pembagi tidak boleh nol!\n");
-            }
-            break;
+            case '-':
+                hasil = angka1 - angka2;
+                cout << "Hasil: " << hasil << endl;
+                break;
 
-        default:
-            printf("Pilihan tidak valid!\n");
+            case '*':
+                hasil = angka1 * angka2;
+                cout << "Hasil: " << hasil << endl;
+                break;
+
+            case '/':
+                if (angka2 != 0) {
+                    hasil = angka1 / angka2;
+                    cout << "Hasil: " << hasil << endl;
+                } else {
+                    cout << "Error: Tidak bisa membagi dengan nol!\n";
+                }
+                break;
+
+            default:
+                cout << "Operator tidak valid!\n";
+        }
+
+        cout << "\nHitung lagi? (1 = ya, 0 = tidak): ";
+        cin >> ulang;
     }
 
+    cout << "Program selesai.\n";
     return 0;
 }
